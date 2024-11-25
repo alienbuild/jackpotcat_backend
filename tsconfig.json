@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "src",
+    "types/**/*.d.ts",
+    "../../../Users/lkfra/AppData/Local/JetBrains/WebStorm2024.3/javascript/typings/express/4.17.21/node_modules/@types/node/globals.d.ts"
+  ]
+}

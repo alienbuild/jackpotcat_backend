@@ -1,0 +1,120 @@
+generator client_js {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int               @id @default(autoincrement())
+  email            String            @unique
+  emailVerified    DateTime?
+  password         String?
+  subscription     Subscription?
+  generatedNumbers GeneratedNumber[]
+  accounts         Account[]
+  sessions         Session[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  SavedNumbers     SavedNumbers[]
+}
+
+model Account {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User     @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VerificationToken {
+  id         Int      @id @default(autoincrement())
+  identifier String
+  token      String
+  expires    DateTime @default(now())
+
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id        Int              @id @default(autoincrement())
+  type      SubscriptionType
+  userId    Int              @unique
+  user      User             @relation(fields: [userId], references: [id])
+  createdAt DateTime         @default(now())
+}
+
+model GeneratedNumber {
+  id        Int                    @id @default(autoincrement())
+  userId    Int
+  user      User                   @relation(fields: [userId], references: [id])
+  entries   GeneratedNumberEntry[]
+  type      GenerationType
+  createdAt DateTime               @default(now())
+}
+
+model GeneratedNumberEntry {
+  id                Int             @id @default(autoincrement())
+  generatedNumberId Int
+  number            Int
+  generatedNumber   GeneratedNumber @relation(fields: [generatedNumberId], references: [id])
+}
+
+model LotteryResult {
+  id        Int             @id @default(autoincrement())
+  drawDate  DateTime        @unique
+  jackpot   Int
+  createdAt DateTime        @default(now())
+  numbers   LotteryNumber[]
+}
+
+model LotteryNumber {
+  id       Int           @id @default(autoincrement())
+  number   Int
+  isBonus  Boolean
+  resultId Int
+  result   LotteryResult @relation(fields: [resultId], references: [id])
+}
+
+model SavedNumbers {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  numbers   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+enum GenerationType {
+  WEIGHTED
+  AI
+}
+
+enum SubscriptionType {
+  FREE
+  PAID
+}
